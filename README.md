@@ -1,1 +1,1 @@
-# wishlist-app
+Simple wishlist app using Flutter
