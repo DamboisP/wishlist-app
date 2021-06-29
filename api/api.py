@@ -42,7 +42,7 @@ def get_items(name):
     if (result is None or len(result) == 0):
         abort(404, description= "Could not find wishlist " + name)
 
-    return make_response(jsonify(result))
+    return make_response(jsonify(result[0]))
 
 # updates a wishlist
 @app.route('/<name>', methods=['POST'])
