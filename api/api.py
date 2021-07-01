@@ -21,13 +21,14 @@ def get_wishlists():
 # creates a new wishlist
 @app.route('/', methods=['POST'])
 def new_wishlist():
+    time.sleep(0.5) # To test loader
+
     if not request.json or not 'name' in request.json:
         abort(400)
 
-    time.sleep(1) # To test loader
-
     wishlist = {
-        'name' : request.json['name']
+        'name' : request.json['name'],
+        'elements' : []
     }
 
     wishlist_db.insert(wishlist)
@@ -37,7 +38,8 @@ def new_wishlist():
 # get details from a wishlist
 @app.route('/<name>', methods=['GET'])
 def get_items(name):
-    time.sleep(1) # To test loader
+    time.sleep(0.5) # To test loader
+
     Wishlists = Query()
     result = wishlist_db.search(Wishlists.name == name)
 
@@ -46,12 +48,11 @@ def get_items(name):
 
     return make_response(jsonify(result[0]))
 
-# updates a wishlist
+# adds an item to a wishlist
 @app.route('/<name>', methods=['POST'])
 def update_wishlist(name):
-    if not request.json or not 'name' in request.json or not 'items' in request.json:
+    if not request.json or not 'name' in request.json:
         abort(400)
-    time.sleep(1) # To test loader
 
     Wishlists = Query()
     result = wishlist_db.search(Wishlists.name == name)
@@ -59,7 +60,15 @@ def update_wishlist(name):
     if (result is None or len(result) == 0):
         abort(404, description= "Could not find wishlist " + name)
 
-    wishlist_db.update({'items': request.json['items']}, Wishlists.name == name)
+    wishlist = result[0]
+
+    item = {
+        'name' : request.json['name']
+    }
+    print(wishlist)
+    wishlist["elements"].append(item)
+
+    wishlist_db.update({'elements': wishlist['elements']}, Wishlists.name == name)
 
     return make_response(jsonify(True))
 
