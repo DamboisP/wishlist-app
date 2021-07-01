@@ -1,19 +1,21 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 class Wishlist {
-  List<WishlistItem> items;
+  List<WishlistItem> elements;
   final String name;
 
   Wishlist({
     required this.name,
-    this.items = const []
+    this.elements = const []
   });
 
   factory Wishlist.fromJson(Map<String, dynamic> json){
     Wishlist list = Wishlist(name: json["name"]);
 
-    if (json["items"] != null) {
-      list.items = (json["items"] as List).map((item) => WishlistItem.fromJson(item)).toList();
+    if (json["elements"] != null) {
+      list.elements = (json["elements"] as List).map((item) => WishlistItem.fromJson(item)).toList();
     }
 
     return list;
@@ -29,12 +31,29 @@ class Wishlist {
 
 class WishlistItem {
   final String name;
+  final Icon icon;
 
   WishlistItem({
-    required this.name
+    required this.name,
+    required this.icon,
   });
   
   factory WishlistItem.fromJson(Map<String, dynamic> json){
-    return WishlistItem(name: json["name"]);
+    var iconData = IconData(json["icon"]["codePoint"], fontFamily: json["icon"]["fontFamily"]);
+
+    return WishlistItem(
+        name: json["name"],
+        icon: Icon(iconData, size: 48,)
+    );
+  }
+
+  Map<String, dynamic> toJson(){
+    return {
+      "name": name,
+      "icon": {
+        "codePoint": icon.icon!.codePoint,
+        "fontFamily": icon.icon!.fontFamily
+      }
+    };
   }
 }

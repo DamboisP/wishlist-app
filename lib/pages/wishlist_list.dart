@@ -67,13 +67,37 @@ class _WishlistListState extends State<WishlistList> {
   Widget _getWishlistView(List<Wishlist> lists) {
     return
         RefreshIndicator(
-        child: ListView.builder(
-        itemCount: lists.length,
+        child: ListView.separated(
+          itemCount: lists.length,
+          separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              leading: Icon(Icons.favorite, color: Globals.accentThemeColor),
-              title: Text(lists[index].name),
-              onTap: () => _openWishlist(context, lists[index].name),
+            return Dismissible(
+              key: Key(lists[index].name),
+              direction: DismissDirection.endToStart,
+              child: ListTile(
+                leading: Icon(Icons.favorite, color: Globals.accentThemeColor),
+                title: Text(lists[index].name),
+                onTap: () => _openWishlist(context, lists[index].name),
+              ),
+              onDismissed: (direction) async {
+                String wishlistName = lists[index].name;
+                setState(() {
+                  lists.removeAt(index);
+                });
+                await HttpWrapper.deleteWishlist(wishlistName);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Wishlist " + wishlistName + " was removed"),
+                  )
+                );
+              },
+              background: Container(
+                color: Colors.red,
+                child: Align(
+                 child: const Padding(child : Icon(Icons.delete, color: Colors.white,), padding: EdgeInsets.all(8),),
+                 alignment: Alignment.centerRight,
+                )
+              ),
             );
           },
         ),

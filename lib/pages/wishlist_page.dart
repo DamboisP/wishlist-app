@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wishlist_app/model/wishlist.dart';
+import 'package:wishlist_app/pages/add_item_popup.dart';
 import 'package:wishlist_app/utils/globals.dart';
 import 'package:wishlist_app/utils/http_wrapper.dart';
 
@@ -31,8 +32,8 @@ class _WishlistPageState extends State<WishlistPage>{
               future: futureWishlist,
               builder: (context, snapshot) {
                 if (snapshot.hasData){
-                  if(snapshot.data!.items.isNotEmpty){
-                    return _wishlistItemsDisplay(snapshot.data!.items);
+                  if(snapshot.data!.elements.isNotEmpty){
+                    return _wishlistItemsDisplay(snapshot.data!.elements);
                   }else {
                     return _emptyListMessage();
                   }
@@ -43,8 +44,30 @@ class _WishlistPageState extends State<WishlistPage>{
                 return CircularProgressIndicator();
               },
               )
-        )
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: () => _showNewItemDialog(),
+          ),
     );
+  }
+
+  void _refreshWishlist(){
+    setState(() {
+      futureWishlist = HttpWrapper.fetchWishlist(widget.wishlistName);
+    });
+  }
+
+  void _showNewItemDialog(){
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx){
+          return AlertDialog(
+              title: const Text("Name your new item"),
+              content: AddItemPopup(wishlistName: widget.wishlistName,)
+          );
+        }
+    ).then((_) => _refreshWishlist());
   }
 
   Widget _emptyListMessage(){
@@ -66,15 +89,15 @@ class _WishlistPageState extends State<WishlistPage>{
         return GridTile(
           child: Container(
             child: Center(
-              child: Icon(Icons.favorite, size: 48,)
+              child: items[index].icon
             ),
             decoration: BoxDecoration(
                 color: Theme.of(context).accentColor,
-                borderRadius: BorderRadius.circular(5)
+                borderRadius: BorderRadius.circular(5),
             ),
           ),
           footer: GridTileBar(
-            title: Text(items[index].name, textAlign: TextAlign.center, ),
+            title: Text(items[index].name, textAlign: TextAlign.center, style: Globals.mediumTextStyle,),
           ),
         );
       },

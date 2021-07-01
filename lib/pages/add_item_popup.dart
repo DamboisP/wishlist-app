@@ -1,20 +1,29 @@
 
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:icon_picker/icon_picker.dart';
+import 'package:wishlist_app/model/wishlist.dart';
 import 'package:wishlist_app/utils/http_wrapper.dart';
 
-class AddWishlistPopup extends StatefulWidget{
+class AddItemPopup extends StatefulWidget{
+  final String wishlistName;
+
+  AddItemPopup({required this.wishlistName});
+
 
   @override
   State<StatefulWidget> createState() {
-    return _AddWishlistPopupState();
+    return _AddItemPopupState();
   }
 }
 
-class _AddWishlistPopupState extends State<AddWishlistPopup>{
+class _AddItemPopupState extends State<AddItemPopup>{
   final _formKey = GlobalKey<FormState>();
   final _inputFielController = TextEditingController();
   var _isLoading = false;
+  var _currentIcon = Icon(Icons.favorite, color: Colors.grey);
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +46,27 @@ class _AddWishlistPopupState extends State<AddWishlistPopup>{
               return null;
             },
           ),
+          Row(
+            children: [
+              _currentIcon,
+              Expanded(
+                child: Padding(child: IconPicker(
+                  enableSearch: false,
+                  initialValue: "favorite",
+                  labelText: "Icon",
+                  onChanged: (value){
+                    var iconDataJson = jsonDecode(value);
+                    IconData icon = IconData(iconDataJson['codePoint'], fontFamily: iconDataJson['fontFamily']);
+
+                    setState(() {
+                      _currentIcon = Icon(icon, color: Colors.grey,);
+                    });
+                  },
+                ),padding: EdgeInsets.only(left: 15),
+                )
+              )
+            ],
+          ),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
@@ -45,7 +75,8 @@ class _AddWishlistPopupState extends State<AddWishlistPopup>{
                     setState(() {
                       _isLoading = true;
                     });
-                    await HttpWrapper.addWishlist(_inputFielController.text);
+                    final item = WishlistItem(name: _inputFielController.text, icon: _currentIcon);
+                    await HttpWrapper.addItemToWishlist(widget.wishlistName, item);
                     Navigator.pop(context);
                   }
                 },

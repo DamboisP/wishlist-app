@@ -68,7 +68,33 @@ class HttpWrapper {
     if(response.statusCode != 200){
       throw Exception("Failed to insert the new wishlist");
     }
+  }
 
+  /// Adds an item to an existing wishlist
+  static Future addItemToWishlist(String wishlistName, WishlistItem item) async {
+    await _initConfigIfNeeded();
+
+    final response = await http.post(
+        Uri.parse(_appConfig!.apiUrl + "/" + wishlistName),
+        body: jsonEncode(item.toJson()),
+        headers: _getHeaders()
+    );
+
+    if(response.statusCode != 200){
+      throw Exception("Failed to insert the new item");
+    }
+  }
+  
+  static Future deleteWishlist(String name) async {
+    await _initConfigIfNeeded();
+    
+    final response = await http.delete(
+      Uri.parse("${_appConfig!.apiUrl}/$name")
+    );
+
+    if(response.statusCode != 200){
+      throw Exception("Failed to insert the wishlist");
+    }
   }
 
 }
