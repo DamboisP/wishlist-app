@@ -1,3 +1,6 @@
+# Custom
+api/*.json
+
 # Miscellaneous
 *.class
 *.lock

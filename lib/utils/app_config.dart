@@ -8,7 +8,6 @@ class AppConfig {
   AppConfig({this.apiUrl = ""});
 
   static Future<AppConfig> getConfig() async {
-
     final contents = await rootBundle.loadString(
         'assets/settings.json'
     );

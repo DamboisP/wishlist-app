@@ -24,6 +24,8 @@ def new_wishlist():
     if not request.json or not 'name' in request.json:
         abort(400)
 
+    time.sleep(1) # To test loader
+
     wishlist = {
         'name' : request.json['name']
     }
@@ -49,6 +51,7 @@ def get_items(name):
 def update_wishlist(name):
     if not request.json or not 'name' in request.json or not 'items' in request.json:
         abort(400)
+    time.sleep(1) # To test loader
 
     Wishlists = Query()
     result = wishlist_db.search(Wishlists.name == name)

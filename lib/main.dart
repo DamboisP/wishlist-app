@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:wishlist_app/app_config.dart';
+import 'package:wishlist_app/utils/globals.dart';
 
-import 'home.dart';
+import 'pages/wishlist_list.dart';
 
+/// Entry point of the app
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  final conf = await AppConfig.getConfig();
-  runApp(WishlistApp(appConfig: conf));
+
+  runApp(MaterialApp(
+      title: Globals.appName,
+      theme: ThemeData(
+          primaryColor: Globals.themeColor,
+          accentColor: Globals.themeColor
+      ),
+      home: WishlistList()
+  ));
 }

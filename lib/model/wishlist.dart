@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Wishlist {
   List<WishlistItem> items;
   final String name;
@@ -15,6 +17,12 @@ class Wishlist {
     }
 
     return list;
+  }
+
+  Map<String, dynamic> toJson(){
+    return {
+      "name": name
+    };
   }
 
 }
