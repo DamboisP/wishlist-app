@@ -4,7 +4,8 @@ from flask.helpers import make_response
 from flask.json import jsonify
 from datetime import datetime
 import time
-from tinydb import TinyDB, Query
+from tinydb import TinyDB, Query, where
+
 
 wishlist_db = TinyDB("wishlists.json")
 
@@ -50,10 +51,10 @@ def get_items(name):
 
 # adds an item to a wishlist
 @app.route('/<name>', methods=['POST'])
-def update_wishlist(name):
+def add_item_to_wishlist(name):
     if not request.json or not 'name' in request.json:
         abort(400)
-
+    print(request.json)
     Wishlists = Query()
     result = wishlist_db.search(Wishlists.name == name)
 
@@ -63,13 +64,23 @@ def update_wishlist(name):
     wishlist = result[0]
 
     item = {
-        'name' : request.json['name']
+        'name' : request.json['name'],
+        'icon' : {
+            'codePoint': request.json['icon']['codePoint'],
+            'fontFamily': request.json['icon']['fontFamily']
+        }
     }
     print(wishlist)
     wishlist["elements"].append(item)
 
     wishlist_db.update({'elements': wishlist['elements']}, Wishlists.name == name)
 
+    return make_response(jsonify(True))
+
+# deletes a wishlist
+@app.route('/<name>', methods=["DELETE"])
+def delete_wishlist(name):
+    wishlist_db.remove(where("name") == name)
     return make_response(jsonify(True))
 
 app.run(debug=True)
